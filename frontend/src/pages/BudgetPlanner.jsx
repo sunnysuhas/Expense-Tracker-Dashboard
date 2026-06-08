@@ -8,7 +8,7 @@ import Skeleton from "../components/ui/Skeleton";
 import { currency, monthName } from "../utils/formatters";
 
 const now = new Date();
-const savingsKey = "finora_savings_goal";
+const defaultGoal = { name: "Emergency fund", targetAmount: 150000, currentAmount: 62500, targetDate: "" };
 
 const BudgetPlanner = () => {
   const [budget, setBudget] = useState(null);
@@ -19,17 +19,24 @@ const BudgetPlanner = () => {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [goal, setGoal] = useState(() => {
-    const stored = localStorage.getItem(savingsKey);
-    return stored ? JSON.parse(stored) : { name: "Emergency fund", targetAmount: 150000, currentAmount: 62500 };
-  });
+  const [goal, setGoal] = useState(defaultGoal);
 
   const load = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/budgets", { params: { month: form.month, year: form.year } });
-      setBudget(data);
-      setForm((current) => ({ ...current, monthlyBudget: data.monthlyBudget || "" }));
+      const [budgetRes, goalsRes] = await Promise.all([
+        api.get("/budgets", { params: { month: form.month, year: form.year } }),
+        api.get("/savings-goals")
+      ]);
+      setBudget(budgetRes.data);
+      setForm((current) => ({ ...current, monthlyBudget: budgetRes.data.monthlyBudget || "" }));
+      const [primaryGoal] = goalsRes.data;
+      if (primaryGoal) {
+        setGoal({
+          ...primaryGoal,
+          targetDate: primaryGoal.targetDate ? new Date(primaryGoal.targetDate).toISOString().slice(0, 10) : ""
+        });
+      }
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
@@ -59,16 +66,27 @@ const BudgetPlanner = () => {
     }
   };
 
-  const saveGoal = (event) => {
+  const saveGoal = async (event) => {
     event.preventDefault();
     const normalized = {
+      _id: goal._id,
       name: goal.name || "Savings goal",
       targetAmount: Number(goal.targetAmount) || 0,
-      currentAmount: Number(goal.currentAmount) || 0
+      currentAmount: Number(goal.currentAmount) || 0,
+      targetDate: goal.targetDate || undefined
     };
-    setGoal(normalized);
-    localStorage.setItem(savingsKey, JSON.stringify(normalized));
-    toast.success("Savings goal updated");
+    try {
+      const { data } = normalized._id
+        ? await api.put(`/savings-goals/${normalized._id}`, normalized)
+        : await api.post("/savings-goals", normalized);
+      setGoal({
+        ...data,
+        targetDate: data.targetDate ? new Date(data.targetDate).toISOString().slice(0, 10) : ""
+      });
+      toast.success("Savings goal updated");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   };
 
   if (loading) return <MotionPage><Skeleton rows={4} /></MotionPage>;
@@ -214,6 +232,10 @@ const BudgetPlanner = () => {
                 <input className="input" type="number" min="0" value={goal.currentAmount} onChange={(event) => setGoal({ ...goal, currentAmount: event.target.value })} />
               </label>
             </div>
+            <label className="block space-y-2">
+              <span className="label">Target date</span>
+              <input className="input" type="date" value={goal.targetDate || ""} onChange={(event) => setGoal({ ...goal, targetDate: event.target.value })} />
+            </label>
             <Button type="submit" className="w-full"><FiTarget /> Save goal</Button>
           </div>
         </form>

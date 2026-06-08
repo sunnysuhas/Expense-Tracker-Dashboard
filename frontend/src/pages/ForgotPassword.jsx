@@ -39,7 +39,7 @@ const ForgotPassword = () => {
           <span className="label">Email</span>
           <div className="relative">
             <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input className="input pl-11" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+            <input className="input input-with-icon" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
           </div>
         </label>
         <Button type="submit" className="mt-5 w-full" disabled={loading}>Prepare reset</Button>

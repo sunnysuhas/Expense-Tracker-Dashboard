@@ -43,14 +43,14 @@ const ResetPassword = () => {
             <span className="label">Reset token</span>
             <div className="relative">
               <FiKey className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input className="input pl-11" value={form.token} onChange={(event) => setForm({ ...form, token: event.target.value })} required />
+              <input className="input input-with-icon" value={form.token} onChange={(event) => setForm({ ...form, token: event.target.value })} required />
             </div>
           </label>
           <label className="block space-y-2">
             <span className="label">New password</span>
             <div className="relative">
               <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input className="input pl-11" type="password" minLength={8} value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
+              <input className="input input-with-icon" type="password" minLength={8} value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
             </div>
           </label>
         </div>

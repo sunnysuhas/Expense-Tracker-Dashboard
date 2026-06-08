@@ -78,7 +78,7 @@ const AuthPage = ({ mode, googleConfigured = false }) => {
                   <span className="label">Name</span>
                   <div className="relative">
                     <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input className="input pl-11" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required />
+                    <input className="input input-with-icon" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required />
                   </div>
                 </label>
               )}
@@ -86,14 +86,14 @@ const AuthPage = ({ mode, googleConfigured = false }) => {
                 <span className="label">Email</span>
                 <div className="relative">
                   <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input className="input pl-11" type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} required />
+                  <input className="input input-with-icon" type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} required />
                 </div>
               </label>
               <label className="block space-y-2">
                 <span className="label">Password</span>
                 <div className="relative">
                   <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input className="input pl-11" type="password" minLength={8} value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
+                  <input className="input input-with-icon" type="password" minLength={8} value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
                 </div>
               </label>
             </div>

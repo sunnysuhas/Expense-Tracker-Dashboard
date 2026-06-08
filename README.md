@@ -1,157 +1,28 @@
-# # Finora — Premium Expense Tracker Dashboard
+# Finora - Premium Expense Tracker Dashboard
 
-Finora is a full-stack expense tracker dashboard built with React, Express, MongoDB, and JWT authentication. It includes transaction management, budget planning, analytics, profile management, export functions, and SaaS-grade UI patterns.
+Finora is a full-stack personal finance SaaS dashboard built with React, Express, MongoDB, and JWT authentication. It includes transaction management, budget planning, savings goals, analytics, profile management, settings, exports, dark mode, and a polished responsive UI.
 
 ## Features
 
-- User registration and login with JWT authentication
-- Google OAuth integration for authentication
-- Transaction CRUD operations
-- Budget planning and expense tracking
-- Analytics dashboard with charts and summary statistics
-- Profile management and user settings
-- Export functionality for reports
-- Security middleware, rate limiting, and request sanitization
-- Demo mode support when MongoDB is not configured
+- User registration, login, logout, forgot password, and reset password
+- JWT protected routes and API authorization
+- Google OAuth integration
+- Transaction CRUD with search, filters, sorting, and pagination
+- Dashboard statistics, smart insights, and activity feed
+- Analytics charts for expenses, income, savings, and categories
+- Monthly budget planner
+- Database-backed savings goals
+- Profile management, settings, theme persistence, and password change
+- CSV and PDF exports
+- Loading states, empty states, toast notifications, and dark mode
+- MongoDB Atlas production support with local demo-mode fallback
 
 ## Tech Stack
 
-- Frontend: React, Vite, Tailwind CSS, Framer Motion, Recharts
-- Backend: Node.js, Express, MongoDB, Mongoose, JWT
-- Auth: bcryptjs, jsonwebtoken, Google OAuth
-- Utilities: axios, compression, helmet, cors, express-rate-limit
-
-## Repository Structure
-
-- `backend/` — Express server, API routes, controllers, models, middleware
-- `frontend/` — React application, pages, components, API client, styles
-- `package.json` — root scripts for installing and running frontend/backend
-
-## Prerequisites
-
-- Node.js 18+ installed
-- npm 10+ installed
-- MongoDB Atlas account or local MongoDB instance (optional; demo mode is available)
-
-## Setup
-
-1. Clone the repository.
-2. Install dependencies for both backend and frontend from the root:
-
-```bash
-npm run install:all
-```
-
-3. Create backend environment variables:
-
-```bash
-cd backend
-cp .env.example .env
-```
-
-4. Open `backend/.env` and set the values:
-
-- `PORT` — backend server port (default `5050`)
-- `NODE_ENV` — `development` or `production`
-- `MONGODB_URI` — MongoDB connection string
-- `JWT_SECRET` — secret key for signing JWTs
-- `JWT_EXPIRES_IN` — token lifespan, e.g. `7d`
-- `CLIENT_URL` — frontend origin, typically `http://127.0.0.1:5173`
-- `GOOGLE_CLIENT_ID` — Google OAuth client ID
-
-If `MONGODB_URI` is not provided, the backend will run in demo mode with in-memory sample data.
-
-## Running the App
-
-### Development
-
-Open two terminal windows or tabs.
-
-- Start the backend server:
-
-```bash
-npm run dev:backend
-```
-
-- Start the frontend app:
-
-```bash
-npm run dev:frontend
-```
-
-Frontend dev server will run on `http://127.0.0.1:5173` by default.
-
-### Production Build
-
-Build the frontend assets:
-
-```bash
-npm run build
-```
-
-Start the backend server:
-
-```bash
-npm start
-```
-
-## API Endpoints
-
-- `GET /api/health` — service and database status
-- `POST /api/auth/register` — user registration
-- `POST /api/auth/login` — login with email/password
-- `POST /api/auth/google-login` — login with Google OAuth
-- `GET /api/transactions` — fetch user transactions
-- `POST /api/transactions` — create a transaction
-- `PUT /api/transactions/:id` — update a transaction
-- `DELETE /api/transactions/:id` — delete a transaction
-- `GET /api/budgets` — fetch budgets
-- `POST /api/budgets` — create a budget
-- `PUT /api/budgets/:id` — update a budget
-- `DELETE /api/budgets/:id` — delete a budget
-- `GET /api/analytics` — fetch analytics data
-- `GET /api/profile` — fetch user profile
-- `PUT /api/profile` — update profile settings
-
-## Notes
-
-- The backend uses CORS configuration to allow requests from `CLIENT_URL`, `http://localhost:5173`, and `http://127.0.0.1:5173`.
-- If you use demo mode, the API will still work with predefined sample data, but data will not persist after server restarts.
-- For Google OAuth to work, register your frontend origin in the Google Cloud Console and provide the client ID in `backend/.env`.
-
-## License
-
-This project is licensed under the MIT License.
-, analytics, exports, dark mode, and responsive animated UI.
-
-## Tech Stack
-
-- Frontend: React, Vite, React Router, Tailwind CSS, Framer Motion, Recharts, Axios, React CountUp, React Hot Toast, React Icons
+- Frontend: React, Vite, React Router, Tailwind CSS, Framer Motion, Recharts, Axios
 - Backend: Node.js, Express.js, MongoDB, Mongoose
-- Auth: JWT, bcrypt password hashing, Google OAuth endpoint
+- Auth: JWT, bcrypt password hashing, Google OAuth
 - Deployment: Vercel frontend, Render backend, MongoDB Atlas database
-
-## Quick Start
-
-```bash
-npm run install:all
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-npm run dev:backend
-npm run dev:frontend
-```
-
-Frontend: `http://localhost:5173`
-
-Backend: `http://127.0.0.1:5050`
-
-## Demo Flow
-
-1. Register with name, email, and password.
-2. Add income and expense transactions.
-3. Set a monthly budget.
-4. Review analytics, insights, activity feed, and profile.
-5. Export CSV or PDF reports from the Transactions page.
 
 ## Project Structure
 
@@ -170,15 +41,75 @@ frontend/
     components/
     context/
     pages/
+    styles/
     utils/
 ```
 
+## Quick Start
+
+```bash
+npm run install:all
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+npm run dev:backend
+npm run dev:frontend
+```
+
+Frontend: `http://127.0.0.1:5173`
+
+Backend: `http://127.0.0.1:5050`
+
 ## Environment
 
-See:
+Backend variables:
 
-- `backend/.env.example`
-- `frontend/.env.example`
+- `PORT` - backend server port
+- `NODE_ENV` - `development` or `production`
+- `MONGODB_URI` - MongoDB Atlas connection string
+- `JWT_SECRET` - secret key for signing JWTs
+- `JWT_EXPIRES_IN` - token lifetime, for example `7d`
+- `CLIENT_URL` - frontend origin
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID
+
+Frontend variables:
+
+- `VITE_API_URL` - backend API URL ending in `/api`
+- `VITE_GOOGLE_CLIENT_ID` - Google OAuth client ID
+
+If `MONGODB_URI` is not provided, the backend runs in demo mode with in-memory sample data.
+
+## API Highlights
+
+- `GET /api/health`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/google`
+- `POST /api/auth/forgot-password`
+- `POST /api/auth/reset-password`
+- `GET /api/transactions`
+- `POST /api/transactions`
+- `PUT /api/transactions/:id`
+- `DELETE /api/transactions/:id`
+- `GET /api/budgets`
+- `PUT /api/budgets`
+- `GET /api/savings-goals`
+- `POST /api/savings-goals`
+- `PUT /api/savings-goals/:id`
+- `DELETE /api/savings-goals/:id`
+- `GET /api/analytics/summary`
+- `GET /api/analytics/charts`
+- `GET /api/analytics/activity`
+- `GET /api/profile`
+- `PUT /api/profile`
+- `PUT /api/profile/password`
+
+## Verification
+
+```bash
+npm run build
+npm audit --omit=dev --prefix backend
+npm audit --omit=dev --prefix frontend
+```
 
 ## Deployment
 

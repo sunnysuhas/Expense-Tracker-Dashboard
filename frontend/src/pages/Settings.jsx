@@ -112,14 +112,14 @@ const Settings = () => {
             <span className="label">Current password</span>
             <div className="relative">
               <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input className="input pl-11" type="password" value={passwords.currentPassword} onChange={(event) => setPasswords({ ...passwords, currentPassword: event.target.value })} required />
+              <input className="input input-with-icon" type="password" value={passwords.currentPassword} onChange={(event) => setPasswords({ ...passwords, currentPassword: event.target.value })} required />
             </div>
           </label>
           <label className="space-y-2">
             <span className="label">New password</span>
             <div className="relative">
               <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input className="input pl-11" type="password" minLength={8} value={passwords.newPassword} onChange={(event) => setPasswords({ ...passwords, newPassword: event.target.value })} required />
+              <input className="input input-with-icon" type="password" minLength={8} value={passwords.newPassword} onChange={(event) => setPasswords({ ...passwords, newPassword: event.target.value })} required />
             </div>
           </label>
         </div>

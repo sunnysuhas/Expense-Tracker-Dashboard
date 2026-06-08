@@ -13,6 +13,7 @@ const store = {
       _id: seededUserId,
       name: "Aarav Mehta",
       email: "demo@finora.app",
+      username: "demo",
       password: seededPasswordHash,
       avatar: "",
       createdAt: monthDate(-4, 4),
@@ -81,6 +82,17 @@ const publicUser = (user) => {
   return safe;
 };
 
+const demoUsername = (email = "user") => {
+  const seed =
+    email
+      .split("@")[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 24) || "user";
+  return `${seed}-${randomUUID().slice(0, 8)}`;
+};
+
 const matchMonth = (date, month, year) => {
   const value = new Date(date);
   return value.getMonth() + 1 === Number(month) && value.getFullYear() === Number(year);
@@ -117,6 +129,7 @@ export const demoStore = {
       _id: randomUUID(),
       name,
       email: normalized,
+      username: demoUsername(normalized),
       password: await bcrypt.hash(password, 12),
       avatar: "",
       createdAt: new Date(),
@@ -182,6 +195,7 @@ export const demoStore = {
         _id: randomUUID(),
         name: payload.name,
         email: payload.email.toLowerCase(),
+        username: demoUsername(payload.email),
         password: "",
         avatar: payload.picture || "",
         googleId: payload.sub,

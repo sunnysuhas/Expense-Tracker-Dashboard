@@ -18,6 +18,28 @@ const authResponse = (user) => ({
   }
 });
 
+const usernameBase = (email = "user") => {
+  const seed = email.split("@")[0] || "user";
+  return seed
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 24) || "user";
+};
+
+const uniqueUsername = async (email) => {
+  const base = usernameBase(email);
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const suffix = crypto.randomBytes(3).toString("hex");
+    const username = `${base}-${suffix}`;
+    const exists = await User.exists({ username });
+    if (!exists) return username;
+  }
+
+  return `${base}-${Date.now().toString(36)}-${crypto.randomBytes(2).toString("hex")}`;
+};
+
 export const registerRules = [
   body("name").trim().isLength({ min: 2 }).withMessage("Name must be at least 2 characters"),
   body("email").isEmail().normalizeEmail().withMessage("Enter a valid email"),
@@ -53,7 +75,7 @@ export const register = asyncHandler(async (req, res) => {
     throw error;
   }
 
-  const user = await User.create({ name, email, password });
+  const user = await User.create({ name, email, password, username: await uniqueUsername(email) });
   res.status(201).json(authResponse(user));
 });
 
@@ -88,12 +110,19 @@ export const googleLogin = asyncHandler(async (req, res) => {
     throw error;
   }
 
-  const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-  const ticket = await googleClient.verifyIdToken({
-    idToken: credential,
-    audience: process.env.GOOGLE_CLIENT_ID
-  });
-  const payload = ticket.getPayload();
+  let payload;
+  try {
+    const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    payload = ticket.getPayload();
+  } catch {
+    const error = new Error("Google login failed. Please try again.");
+    error.statusCode = 401;
+    throw error;
+  }
 
   if (isDemoMode()) {
     const user = demoStore.googleUser(payload);
@@ -105,10 +134,12 @@ export const googleLogin = asyncHandler(async (req, res) => {
     user = await User.create({
       name: payload.name,
       email: payload.email,
+      username: await uniqueUsername(payload.email),
       avatar: payload.picture,
       googleId: payload.sub
     });
   } else {
+    user.username = user.username || (await uniqueUsername(payload.email));
     user.avatar = user.avatar || payload.picture;
     user.googleId = user.googleId || payload.sub;
     await user.save();

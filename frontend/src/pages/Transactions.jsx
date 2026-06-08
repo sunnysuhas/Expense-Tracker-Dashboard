@@ -147,7 +147,7 @@ const Transactions = () => {
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
           <label className="relative xl:col-span-2">
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input className="input pl-11" placeholder="Search title or category" value={filters.search} onChange={(event) => updateFilters({ ...filters, search: event.target.value })} />
+            <input className="input input-with-icon" placeholder="Search title or category" value={filters.search} onChange={(event) => updateFilters({ ...filters, search: event.target.value })} />
           </label>
           <select className="input" value={filters.type} onChange={(event) => updateFilters({ ...filters, type: event.target.value })}>
             <option value="">All types</option>

@@ -86,7 +86,7 @@ const Profile = () => {
               <span className="label">Avatar URL</span>
               <div className="relative">
                 <FiCamera className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input className="input pl-11" value={form.avatar} onChange={(event) => setForm({ ...form, avatar: event.target.value })} placeholder="https://..." />
+                <input className="input input-with-icon" value={form.avatar} onChange={(event) => setForm({ ...form, avatar: event.target.value })} placeholder="https://..." />
               </div>
             </label>
           </div>
