@@ -1,9 +1,9 @@
 import { lazy, Suspense } from "react";
-import { AnimatePresence } from "framer-motion";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import AppLayout from "./components/layout/AppLayout";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
 import Skeleton from "./components/ui/Skeleton";
 
 const Analytics = lazy(() => import("./pages/Analytics"));
@@ -17,14 +17,11 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Transactions = lazy(() => import("./pages/Transactions"));
 
-const App = ({ googleConfigured = false }) => {
-  const location = useLocation();
-
-  return (
+const App = ({ googleConfigured = false }) => (
     <>
-      <Suspense fallback={<div className="min-h-screen bg-slate-50 p-6 dark:bg-ink"><Skeleton rows={5} /></div>}>
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
+      <ErrorBoundary>
+        <Suspense fallback={<div className="min-h-screen bg-slate-50 p-6 dark:bg-ink"><Skeleton rows={5} /></div>}>
+          <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<AuthPage mode="login" googleConfigured={googleConfigured} />} />
             <Route path="/register" element={<AuthPage mode="register" googleConfigured={googleConfigured} />} />
@@ -46,11 +43,10 @@ const App = ({ googleConfigured = false }) => {
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </AnimatePresence>
-      </Suspense>
+        </Suspense>
+      </ErrorBoundary>
       <Toaster position="top-right" toastOptions={{ duration: 2800 }} />
     </>
-  );
-};
+);
 
 export default App;

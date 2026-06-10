@@ -16,12 +16,7 @@ export const monthName = (month) =>
   new Date(2026, Number(month) - 1, 1).toLocaleString("en-US", { month: "long" });
 
 export const initials = (name = "User") =>
-  name
-    .split(" ")
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  (name.trim()[0] || "U").toUpperCase();
 
 export const categories = [
   "Food",

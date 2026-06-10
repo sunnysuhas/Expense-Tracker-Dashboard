@@ -106,13 +106,14 @@ export const AuthProvider = ({ children }) => {
   const setSession = (payload) => persist(payload);
 
   const logout = async () => {
+    const token = auth.token;
+    clearSession();
+    setCheckingSession(false);
     try {
-      if (auth.token) await api.post("/auth/logout");
+      if (token) await api.post("/auth/logout", null, { headers: { Authorization: `Bearer ${token}` } });
     } catch {
       // Local logout should still complete if the server is unavailable.
     } finally {
-      clearSession();
-      setCheckingSession(false);
       toast.success("Logged out");
     }
   };

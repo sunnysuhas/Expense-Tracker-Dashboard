@@ -15,6 +15,7 @@ const Profile = () => {
   const [form, setForm] = useState({ name: "", avatar: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -49,6 +50,7 @@ const Profile = () => {
   if (loading) return <MotionPage><Skeleton rows={5} /></MotionPage>;
 
   const { user, stats } = profile;
+  const showAvatarImage = Boolean(form.avatar && !avatarFailed);
 
   return (
     <MotionPage className="space-y-6">
@@ -62,17 +64,33 @@ const Profile = () => {
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
-        <motion.section whileHover={{ y: -4 }} className="premium-card relative overflow-hidden p-6 text-center">
-          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-softPink/25 via-highlight/20 to-primary/20" />
-          <div className="relative mx-auto grid h-28 w-28 place-items-center overflow-hidden rounded-2xl border-4 border-white bg-softPink text-3xl font-black text-ink shadow-premium dark:border-slate-900">
-            {form.avatar ? <img src={form.avatar} alt={form.name} className="h-full w-full object-cover" /> : initials(form.name)}
+        <motion.section
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileHover={{ y: -4 }}
+          transition={{ duration: 0.28 }}
+          className="premium-card relative overflow-hidden p-6 text-center"
+        >
+          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-r from-softPink/25 via-highlight/20 to-primary/20" />
+          <div className="relative mx-auto grid h-28 w-28 place-items-center overflow-hidden rounded-full border-4 border-white bg-gradient-to-br from-softPink via-highlight to-primary text-4xl font-black text-white shadow-premium dark:border-slate-900">
+            {showAvatarImage ? (
+              <img src={form.avatar} alt={form.name || "Profile avatar"} onError={() => setAvatarFailed(true)} className="h-full w-full object-cover" />
+            ) : (
+              initials(form.name || user.name)
+            )}
           </div>
-          <h3 className="relative mt-5 text-2xl font-black">{user.name}</h3>
-          <p className="mt-1 text-sm font-semibold text-slate-500">{user.email}</p>
+          <h3 className="relative mx-auto mt-5 max-w-full truncate text-2xl font-black">{user.name}</h3>
+          <p className="mx-auto mt-1 max-w-full truncate text-sm font-semibold text-slate-500 dark:text-slate-400">{user.email}</p>
           <p className="mt-4 inline-flex rounded-lg bg-slate-100 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500 dark:bg-slate-900 dark:text-slate-300">Joined {dateLabel(user.createdAt)}</p>
         </motion.section>
 
-        <form onSubmit={save} className="premium-card p-6">
+        <motion.form
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, delay: 0.06 }}
+          onSubmit={save}
+          className="premium-card p-6"
+        >
           <div>
             <p className="label">Account details</p>
             <h3 className="mt-1 text-lg font-black">Update profile</h3>
@@ -86,12 +104,12 @@ const Profile = () => {
               <span className="label">Avatar URL</span>
               <div className="relative">
                 <FiCamera className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input className="input input-with-icon" value={form.avatar} onChange={(event) => setForm({ ...form, avatar: event.target.value })} placeholder="https://..." />
+                <input className="input input-with-icon" value={form.avatar} onChange={(event) => { setAvatarFailed(false); setForm({ ...form, avatar: event.target.value }); }} placeholder="https://..." />
               </div>
             </label>
           </div>
           <Button type="submit" className="mt-5" disabled={saving}><FiSave /> Save changes</Button>
-        </form>
+        </motion.form>
       </div>
 
       <motion.div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06 } } }}>

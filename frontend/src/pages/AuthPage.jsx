@@ -6,18 +6,21 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { FiBarChart2, FiLock, FiMail, FiUser } from "react-icons/fi";
 import Button from "../components/ui/Button";
 import MotionPage from "../components/ui/MotionPage";
+import Skeleton from "../components/ui/Skeleton";
 import { useAuth } from "../context/AuthContext";
 
 const AuthPage = ({ mode, googleConfigured = false }) => {
   const isRegister = mode === "register";
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, login, register, googleLogin } = useAuth();
+  const { checkingSession, isAuthenticated, login, register, googleLogin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const target = location.state?.from?.pathname || "/dashboard";
+  const justLoggedOut = Boolean(location.state?.loggedOut);
 
-  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+  if (checkingSession) return <div className="min-h-screen bg-slate-50 p-6 dark:bg-ink"><Skeleton rows={4} /></div>;
+  if (isAuthenticated && !justLoggedOut) return <Navigate to="/dashboard" replace />;
 
   const submit = async (event) => {
     event.preventDefault();
