@@ -1,54 +1,61 @@
-# Deployment Guide
+# Finora Production Deployment Guide
 
-## MongoDB Atlas
+This guide details the step-by-step instructions to deploy the Finora Expense Tracker Dashboard to production environments using **MongoDB Atlas**, **Render (Backend)**, and **Vercel (Frontend)**.
 
-1. Create a MongoDB Atlas cluster.
-2. Create a database user.
-3. Add the Render outbound IPs or temporarily allow `0.0.0.0/0` during setup.
-4. Copy the connection string into `backend/.env` as `MONGODB_URI`.
+---
 
-## Backend on Render
+## 1. Database Configuration (MongoDB Atlas)
 
-1. Create a new Web Service.
-2. Set root directory to `backend`.
-3. Build command:
+1. **Create Cluster**: Sign in to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and spin up a new shared cluster.
+2. **Database Access**: Under *Database Access*, create a new database user. Use a secure password and note down the credentials.
+3. **Network Access**: Under *Network Access*, add outbound server IP addresses or temporarily set access to `0.0.0.0/0` (allow access from anywhere) during testing.
+4. **Connection String**: Click *Connect*, select *Drivers (Node.js)*, and copy the connection string. Replace `<db_password>` with your database user password and specify the database name (e.g. `finora`).
+   - Example: `mongodb+srv://finoraadmin:<password>@nexora-cluster.gbqiuzd.mongodb.net/finora?retryWrites=true&w=majority`
 
-```bash
-npm install
-```
+---
 
-4. Start command:
+## 2. API Deployment (Render)
 
-```bash
-npm start
-```
+Render is used to host the Express backend service.
 
-5. Add environment variables from `backend/.env.example`.
-6. Set `CLIENT_URL` to the deployed Vercel frontend URL.
+1. **New Web Service**: Connect your GitHub repository to [Render](https://render.com/) and create a new **Web Service**.
+2. **Root Directory**: Set the root directory field to `backend`.
+3. **Runtime Config**:
+   - **Runtime**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+4. **Environment Variables**: Add variables from `backend/.env.example`:
+   - `PORT`: `10000` (or leave default, Render sets this automatically)
+   - `NODE_ENV`: `production`
+   - `MONGODB_URI`: *Your MongoDB connection string*
+   - `JWT_SECRET`: *A long, randomly generated secure token string*
+   - `JWT_EXPIRES_IN`: `7d`
+   - `CLIENT_URL`: *Your deployed Vercel frontend URL* (e.g. `https://expense-tracker-dashboard-mauve.vercel.app`)
+   - `GOOGLE_CLIENT_ID`: *Optional Google OAuth Client ID*
 
-## Frontend on Vercel
+---
 
-1. Import the repository.
-2. Set root directory to `frontend`.
-3. Build command:
+## 3. Client Deployment (Vercel)
 
-```bash
-npm run build
-```
+Vercel is used to host the React client Single Page Application.
 
-4. Output directory:
+1. **Import Repository**: Connect your GitHub repository to [Vercel](https://vercel.com/) and import the project.
+2. **Root Directory**: Set the root directory field to `frontend`.
+3. **Build & Development Settings**:
+   - **Framework Preset**: `Vite` (Vercel detects this automatically)
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. **Environment Variables**: Add variables from `frontend/.env.example`:
+   - `VITE_API_URL`: *Your Render backend URL plus `/api`* (e.g. `https://expense-tracker-dashboard-dkio.onrender.com/api`)
+   - `VITE_GOOGLE_CLIENT_ID`: *Your Google OAuth Client ID*
+5. **Deploy**: Click Deploy. Vercel will build the React bundles and distribute them.
 
-```bash
-dist
-```
+---
 
-5. Add environment variables from `frontend/.env.example`.
-6. Set `VITE_API_URL` to the Render backend URL plus `/api`.
+## 4. Production Checklist & Verification
 
-## Production Checklist
-
-- Use strong `JWT_SECRET`.
-- Configure `GOOGLE_CLIENT_ID` on both frontend and backend.
-- Restrict MongoDB network access before public launch.
-- Set `NODE_ENV=production`.
-- Confirm CORS `CLIENT_URL` matches the Vercel domain.
+* [x] **Secure HTTPS**: Render and Vercel automatically configure SSL certificates. Ensure client calls use `https`.
+* [x] **CORS Configuration**: Verify `CLIENT_URL` in backend exactly matches the frontend domain.
+* [x] **Rate Limiting Active**: Ensure rate limiters block excessive login attempts.
+* [x] **Database Connectivity**: Call the backend health check `https://<api-url>/api/health` to confirm the MDB state is `connected`.
+* [x] **Assets Bundled**: Verify build logs show zero compile errors.
